@@ -1,0 +1,113 @@
+<h1>
+    <% if (tipoDatos == "puestos") { %>
+    PUESTOS
+    <% } else if (tipoDatos == "empleados") { %>
+    EMPLEADOS
+    <% } else { %>
+    VENTANA PRINCIPAL
+    <% } %>
+    <script>
+        function deshabilitarBoton(){
+            var cant = document.getElementById('cantidad').value;
+            cant = Number(cant);
+            if (cant == "" || (!isNaN(cant) && cant == Math.trunc(cant))){
+                document.getElementById('cantBoton').disabled = false;
+            }
+            else{
+                document.getElementById('cantBoton').disabled = true;    
+            }
+        }
+    </script>
+    <form action = "ventanaPrincipal" method = "POST">
+        <div>
+            <button formaction = "listarPuestos" name = "listarPuestosB">
+                Listar Puestos
+            </button>
+            <button formaction = "listarEmpleados" name = "listarEmpleadosB">
+                Listar Empleados
+            </button>
+        </div>
+        <div>
+            <input type = "text" id = "nombreProducto" name = "nomProd">
+            <button formaction = "filtrarNom" name = "nomProdBoton">
+                Filtrar nombre
+            </button>
+        </div>
+        <div>
+            <input type = "text" id = "cantidad" name = "cant" onchange="deshabilitarBoton()">
+            <button formaction = "filtrarCant" id="cantBoton" name = "cantBoton">
+                Filtrar cantidad
+            </button>
+        </div>
+        <div>
+            <button formaction = "insertar" name = "nuevoBoton">
+                Insertar nuevo articulo
+            </button>
+            <button formaction = "salir" name = "salirBoton">
+                Salir
+            </button>
+        </div>
+    </form>
+</h1>
+<div>
+    <%=mensajeError%>
+    <% if (tipoDatos == "puestos") { %>
+        <table>
+            <thread>
+                <tr>
+                    <th class = "text-center">Nombre del puesto</th>
+                    <th class = "text-center">Salario X Hora</th>
+                </tr>
+            </thread>
+            <tbody>
+                <% for (puesto of datos) {%>
+                <tr>
+                    <td>
+                        <%=puesto.Nombre%>
+                    </td>
+                    <td>
+                        <%=puesto.SalarioXHora%>
+                    </td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    <% } else if (tipoDatos == "empleados") { %>
+        <table>
+            <thread>
+                <tr>
+                    <th class = "text-center">Nombre</th>
+                    <th class = "text-center">Id Tipo de Identificacion</th>
+                    <th class = "text-center">Valor Documento de Identificacion</th>
+                    <th class = "text-center">Id Departamento</th>
+                    <th class = "text-center">Puesto</th>
+                    <th class = "text-center">Fecha de Nacimiento</th>
+                </tr>
+            </thread>
+            <tbody>
+                <% for (empleado of datos) {%>
+                <tr>
+                    <td>
+                        <%=empleado.Nombre%>
+                    </td>
+                    <td>
+                        <%=empleado.IdTipoIdentificacion%>
+                    </td>
+                    <td>
+                        <%=empleado.ValorDocumentoIdentificacion%>
+                    </td>
+                    <td>
+                        <%=empleado.IdDepartamento%>
+                    </td>
+                    <td>
+                        <%=empleado.Puesto%>
+                    </td>
+                    <td>
+                        <%=empleado.FechaNacimiento%>
+                    </td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    <% } else {} %>
+</div>
