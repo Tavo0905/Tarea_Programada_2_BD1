@@ -11,16 +11,19 @@ const based = new (require('rest-mssql-nodejs'))({
 })
 
 // Variables
-var admin = {}
-var filtro = 0
+var admin = {};
+let listaPuestos = [];
+let listaEmpleados = [];
+cargarPuestos();
+cargarEmpleados();
 
 // Establecimiento de parametros para la pagina web
-app.use(express.urlencoded({extended: false}))
-app.set('view-engine', 'ejs')
+app.use(express.urlencoded({extended: false}));
+app.set('view-engine', 'ejs');
 
 // Extensiones de la pagina web
 app.get('/', (req, res) => {
-    res.render('login.ejs',{mensaje:""})
+    res.render('login.ejs',{mensaje:""});
 })
 app.get('/ventanaPrincipal', (req, res) => {
     res.render('ventanaPrincipal.ejs', {mensajeError : "",
@@ -28,7 +31,7 @@ app.get('/ventanaPrincipal', (req, res) => {
 })
 
 app.post('/insertar', (req, res) => {
-    res.render('insertar.ejs')
+    res.render('insertar.ejs');
 })
 
 // Funciones de las paginas web
@@ -36,24 +39,22 @@ app.post('/login', (req, res) => {
     admin = {
         user : req.body.name,
         password : req.body.pass
-    }
-    validarDatos(admin, res)
+    };
+    validarDatos(admin, res);
 })
 app.post('/listarPuestos', (req, res) => {
+    console.log(listaPuestos);
     res.render('ventanaPrincipal.ejs', {mensajeError : "",
-    tipoDatos : "puestos", datos : []});
+    tipoDatos : "puestos", datos : listaPuestos});
 })
 app.post('/listarEmpleados', (req, res) => {
+    console.log(listaEmpleados);
     res.render('ventanaPrincipal.ejs', {mensajeError : "",
-    tipoDatos : "empleados", datos : []});
+    tipoDatos : "empleados", datos : listaEmpleados});
 })
 /*app.post('/filtrarNom', (req, res) => {
     filtro = req.body.nomProd;
     filtrarNombre(filtro, res);
-})
-app.post('/filtrarCant', (req, res) => {
-    filtro = req.body.cant;
-    filtrarCantidad(filtro, res);
 })
 app.post('/insertarB', (req, res) => {
     let listaArticulos = [];
@@ -82,7 +83,7 @@ app.post('/insertarB', (req, res) => {
     }, 1500)
 })*/
 app.post('/cancelar', (req, res) => {
-    res.redirect('./ventanaPrincipal')
+    res.redirect('./ventanaPrincipal');
 })
 app.post('/salir', (req, res) => {
     res.redirect('./');
@@ -94,7 +95,7 @@ function validarDatos (adminDatos, res) {
         null, {inUserName : adminDatos.user, inPassword : adminDatos.password,
         outResult : 0});
         if (resultado != undefined) {
-            console.log(resultado.data[0][0])
+            console.log(resultado.data[0][0]);
             if (resultado.data[0][0].outResult == 0)
                 res.redirect("./ventanaPrincipal");
             else
@@ -120,25 +121,28 @@ function filtrarNombre (nombre, res) {
     }, 1500)*/
 }
 
-function filtrarCantidad (cantidad, res) {
-    let articulosFiltrados = [];
-    if (cantidad == '')
-        cantidad = -1;
-    else {
-        cantidad = parseInt(cantidad);
-    }
-    /*setTimeout(async () => {
-        const resFiltroCant = await based.executeStoredProcedure('FiltrarCantidad', null,
-        {inCantidad : cantidad, outResult : 0});
-        if (resFiltroCant != undefined) {
-            console.log(resFiltroCant.data[0]);
-            for (articulo of resFiltroCant.data[0]) {
-                articulosFiltrados.push(articulo);
-            }
-            res.render('articulos.ejs', {mensajeError : "",
-            productos : articulosFiltrados});
+function cargarPuestos() {
+    setTimeout(async () => {
+        const resultado = await based.executeStoredProcedure('ListarPuestos',
+        null, {outResult : 0});
+        if (resultado != undefined) {
+            console.log(resultado.data[0]);
+            for (puesto of resultado.data[0])
+                listaPuestos.push([false, puesto]);
         }
-    }, 1500)*/
+    }, 1500)
+}
+
+function cargarEmpleados() {
+    setTimeout(async () => {
+        const resultado = await based.executeStoredProcedure('ListarEmpleados',
+        null, {outResult : 0});
+        if (resultado != undefined) {
+            console.log(resultado.data[0]);
+            for (empleado of resultado.data[0])
+                listaEmpleados.push([false, empleado]);
+        }
+    }, 1500)
 }
 
 // Creacion del puerto para acceder la pagina web
