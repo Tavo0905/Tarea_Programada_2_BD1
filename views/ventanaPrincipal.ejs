@@ -45,51 +45,53 @@
                 Salir
             </button>
         </div>
+        <div>
+            <%=mensajeError%>
+            <% if (tipoDatos == "puestos") { %>
+                <div style = "font-size: large;">
+                    Nombre del puesto
+                </div>
+                <select id = "puestosListBox" name = "puestosListBox" size = "25">
+                    <% for (puesto of datos) {%>
+                        <% if (puesto[0] == false) { %>
+                                <option value = "<%= puesto[1].Puesto %>"
+                                style = "font-size: large;">
+                                    <%= puesto[1].Puesto %>
+                                </option>
+                        <% } %>
+                    <% } %>
+                </select>
+                <div>
+                    <button formaction = "editarPuesto" id = "editarPuestoB">
+                        Editar
+                    </button>
+                    <button formaction = "eliminarPuesto" id = "eliminarPuestoB">
+                        Eliminar
+                    </button>
+                </div>
+            <% } else if (tipoDatos == "empleados") { %>
+                <div style = "font-size: large;">
+                    Nombre de los empleados
+                </div>
+                <select id = "empleadosListBox" name = "empleadosListBox" size = "25">
+                    <% for (empleado of datos) {%>
+                        <% if (empleado[0] == false) { %>
+                                <option value = "<%= empleado[1].Nombre %>"
+                                style = "font-size: large;">
+                                    <%= empleado[1].Nombre + " | " + empleado[1].Puesto %>
+                                </option>
+                        <% } %>
+                    <% } %>
+                </select>
+                <div>
+                    <button formaction = "editarEmpleado" id = "editarEmpleadoB">
+                        Editar
+                    </button>
+                    <button formaction = "eliminarEmpleado" id = "eliminarEmpleadoB">
+                        Eliminar
+                    </button>
+                </div>
+            <% } else {} %>
+        </div>
     </form>
 </h1>
-<div>
-    <%=mensajeError%>
-    <% if (tipoDatos == "puestos") { %>
-        <table>
-            <thread>
-                <tr>
-                    <th class = "text-center">Nombre del puesto</th>
-                </tr>
-            </thread>
-            <tbody>
-                <% for (puesto of datos) {%>
-                    <% if (puesto[0] == false) { %>
-                    <tr>
-                        <td>
-                            <%=puesto[1].Puesto%>
-                        </td>
-                    </tr>
-                    <% } %>
-                <% } %>
-            </tbody>
-        </table>
-    <% } else if (tipoDatos == "empleados") { %>
-        <table>
-            <thread>
-                <tr>
-                    <th class = "text-center">Nombre</th>
-                    <th class = "text-center">Puesto</th>
-                </tr>
-            </thread>
-            <tbody>
-                <% for (empleado of datos) {%>
-                    <% if (empleado[0] == false) { %>
-                        <tr>
-                            <td>
-                                <%=empleado[1].Nombre%>
-                            </td>
-                            <td>
-                                <%=empleado[1].Puesto%>
-                            </td>
-                        </tr>
-                    <% } %>
-                <% } %>
-            </tbody>
-        </table>
-    <% } else {} %>
-</div>

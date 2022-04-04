@@ -1,5 +1,6 @@
 // Importacion de modulos
-const express = require('express')
+const express = require('express');
+const { redirect } = require('express/lib/response');
 const res = require('express/lib/response')
 const app = express()
 const based = new (require('rest-mssql-nodejs'))({
@@ -29,9 +30,8 @@ app.get('/ventanaPrincipal', (req, res) => {
     res.render('ventanaPrincipal.ejs', {mensajeError : "",
     tipoDatos : "", datos : []});
 })
-
-app.post('/insertar', (req, res) => {
-    res.render('insertar.ejs');
+app.post('/insertarPuesto', (req, res) => {
+    res.render('insertarPuesto.ejs');
 })
 
 // Funciones de las paginas web
@@ -52,6 +52,30 @@ app.post('/listarEmpleados', (req, res) => {
     res.render('ventanaPrincipal.ejs', {mensajeError : "",
     tipoDatos : "empleados", datos : listaEmpleados});
 })
+app.post('/eliminarPuesto', (req, res) => {
+    console.log(req.body.puestosListBox);
+    eliminarPuesto(req.body.puestosListBox);
+    res.render('ventanaPrincipal.ejs', {mensajeError : "",
+    tipoDatos : "puestos", datos : listaPuestos});
+})
+app.post('/eliminarEmpleado', (req, res) => {
+    console.log(req.body.empleadosListBox);
+    eliminarEmpleado(req.body.empleadosListBox);
+    res.render('ventanaPrincipal.ejs', {mensajeError : "",
+    tipoDatos : "empleados", datos : listaEmpleados});
+})
+app.post('/insertarPuestoB', (req, res) => {
+    let nuevoPuesto = {Puesto: req.body.nombrePuesto,
+    SalarioXHora: req.body.salario};
+    console.log(nuevoPuesto);
+    insertarPuestoFunc(nuevoPuesto);
+    res.redirect('./ventanaPrincipal');
+})
+
+
+
+
+
 /*app.post('/filtrarNom', (req, res) => {
     filtro = req.body.nomProd;
     filtrarNombre(filtro, res);
@@ -88,6 +112,9 @@ app.post('/cancelar', (req, res) => {
 app.post('/salir', (req, res) => {
     res.redirect('./');
 })
+
+
+
 // Funciones logicas
 function validarDatos (adminDatos, res) {
     setTimeout(async () => {
@@ -127,8 +154,21 @@ function cargarPuestos() {
         null, {outResult : 0});
         if (resultado != undefined) {
             console.log(resultado.data[0]);
-            for (puesto of resultado.data[0])
-                listaPuestos.push([false, puesto]);
+            for (puesto of resultado.data[0]) {
+                var valido = true;
+                if (listaPuestos.length == 0) {
+                    listaPuestos.push([false, puesto]);
+                    continue;
+                }
+                else {
+                    for (puestoExiste of listaPuestos) {
+                        if (puestoExiste[1].Puesto == puesto.Puesto)
+                            valido = false;
+                    }
+                    if (valido)
+                        listaPuestos.push([false, puesto]);
+                }
+            }
         }
     }, 1500)
 }
@@ -144,6 +184,34 @@ function cargarEmpleados() {
         }
     }, 1500)
 }
+
+function eliminarPuesto(nomPuesto) {
+    for (puesto of listaPuestos) {
+        if (puesto[1].Puesto == nomPuesto) {
+            puesto[0] = true;
+        }
+    }
+    return;
+}
+
+function eliminarEmpleado(nomEmpleado) {
+    for (empleado of listaEmpleados) {
+        if (empleado[1].Nombre == nomEmpleado) {
+            empleado[0] = true;
+        }
+    }
+    return;
+}
+
+function insertarPuestoFunc(nuevoPuesto) {
+    setTimeout(async () => {
+        const respuesta = await based.executeStoredProcedure('InsertarPuesto', null,
+        {inPuesto : nuevoPuesto.Puesto, inSalario : nuevoPuesto.SalarioXHora, outResult : 0});
+        cargarPuestos();
+    }, 1500)
+}
+
+
 
 // Creacion del puerto para acceder la pagina web
 app.listen(3000)
