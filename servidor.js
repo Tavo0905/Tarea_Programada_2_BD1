@@ -71,16 +71,11 @@ app.post('/insertarPuestoB', (req, res) => {
     insertarPuestoFunc(nuevoPuesto);
     res.redirect('./ventanaPrincipal');
 })
-
-
-
-
-
-/*app.post('/filtrarNom', (req, res) => {
-    filtro = req.body.nomProd;
+app.post('/filtrarEmpleado', (req, res) => {
+    filtro = req.body.nomEmpleado;
     filtrarNombre(filtro, res);
 })
-app.post('/insertarB', (req, res) => {
+/*app.post('/insertarB', (req, res) => {
     let listaArticulos = [];
     articulo = {nombre:req.body.name,precio:req.body.precio};
     setTimeout(async () => {
@@ -133,19 +128,20 @@ function validarDatos (adminDatos, res) {
 }
 
 function filtrarNombre (nombre, res) {
-    let articulosFiltrados = [];
-    /*setTimeout(async () => {
+    let empleadosFiltrados = [];
+    setTimeout(async () => {
         const resFiltroNom = await based.executeStoredProcedure('FiltrarNombre', null,
-        {inNombre : nombre, outResult : 0});
+        {inFiltroNom : nombre, outResult : 0});
         if (resFiltroNom != undefined) {
-            console.log(resFiltroNom.data[0]);
-            for (articulo of resFiltroNom.data[0]) {
-                articulosFiltrados.push(articulo);
+            for (empleado of resFiltroNom.data[0]) {
+                if (listaEmpleados.find(existe =>
+                    existe[0] === false && existe[1].Nombre === empleado.Nombre))
+                    empleadosFiltrados.push([false, empleado]);
             }
-            res.render('articulos.ejs', {mensajeError : "",
-            productos : articulosFiltrados});
+            res.render('ventanaPrincipal.ejs', {mensajeError : "",
+            tipoDatos : "empleados", datos : empleadosFiltrados});
         }
-    }, 1500)*/
+    }, 1500)
 }
 
 function cargarPuestos() {
@@ -169,6 +165,14 @@ function cargarPuestos() {
                         listaPuestos.push([false, puesto]);
                 }
             }
+            listaPuestos.sort(function (puesto1, puesto2) {
+                if (puesto1[1].Puesto > puesto2[1].Puesto)
+                    return 1;
+                if (puesto1[1].Puesto < puesto2[1].Puesto)
+                    return -1;
+                else
+                    return 0;
+            })
         }
     }, 1500)
 }
