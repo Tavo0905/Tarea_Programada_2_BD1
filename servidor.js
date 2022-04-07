@@ -15,8 +15,12 @@ const based = new (require('rest-mssql-nodejs'))({
 var admin = {};
 let listaPuestos = [];
 let listaEmpleados = [];
+let listaTipoDoc = [];
+let listaDepartamentos = [];
 cargarPuestos();
 cargarEmpleados();
+cargarTipoDoc();
+cargarDepartamentos();
 
 // Establecimiento de parametros para la pagina web
 app.use(express.urlencoded({extended: false}));
@@ -32,6 +36,13 @@ app.get('/ventanaPrincipal', (req, res) => {
 })
 app.post('/insertarPuesto', (req, res) => {
     res.render('insertarPuesto.ejs');
+})
+app.post('/insertarEmpleado', (req, res) => {
+    res.render('insertarEmpleado.ejs', {
+        listaPuestos : listaPuestos,
+        listaDepartamentos : listaDepartamentos,
+        listaTipoDoc : listaTipoDoc
+    });
 })
 
 // Funciones de las paginas web
@@ -53,13 +64,11 @@ app.post('/listarEmpleados', (req, res) => {
     tipoDatos : "empleados", datos : listaEmpleados});
 })
 app.post('/eliminarPuesto', (req, res) => {
-    console.log(req.body.puestosListBox);
     eliminarPuesto(req.body.puestosListBox);
     res.render('ventanaPrincipal.ejs', {mensajeError : "",
     tipoDatos : "puestos", datos : listaPuestos});
 })
 app.post('/eliminarEmpleado', (req, res) => {
-    console.log(req.body.empleadosListBox);
     eliminarEmpleado(req.body.empleadosListBox);
     res.render('ventanaPrincipal.ejs', {mensajeError : "",
     tipoDatos : "empleados", datos : listaEmpleados});
@@ -71,36 +80,22 @@ app.post('/insertarPuestoB', (req, res) => {
     insertarPuestoFunc(nuevoPuesto);
     res.redirect('./ventanaPrincipal');
 })
+app.post('/insertarEmpleadoB', (req, res) => {
+    let nuevoEmpleado = {
+        Nombre : req.body.nomEmpleado,
+        IdTipoIdentificacion : req.body.tipoIdentificacionSeleccion,
+        ValorDocumentoIdentificacion : req.body.valorDoc,
+        IdDepartamento : req.body.departamentoSeleccion,
+        Puesto : req.body.puestoSeleccion,
+        FechaNacimiento : req.body.fechaNacimiento
+    };
+    insertarEmpleadoFunc(nuevoEmpleado);
+    res.redirect('./ventanaPrincipal');
+})
 app.post('/filtrarEmpleado', (req, res) => {
     filtro = req.body.nomEmpleado;
     filtrarNombre(filtro, res);
 })
-/*app.post('/insertarB', (req, res) => {
-    let listaArticulos = [];
-    articulo = {nombre:req.body.name,precio:req.body.precio};
-    setTimeout(async () => {
-        const respuesta = await based.executeStoredProcedure('InsertarArticulo', null,
-        {inNombre : articulo.nombre, inPrecio : articulo.precio, outResult : 0});
-        const productos = await based.executeStoredProcedure('SeleccionarArticulos',
-        null, {outResult : 0});
-        if (respuesta != undefined && productos != undefined) {
-            for (articulo of productos.data[0]) {
-                listaArticulos.push(articulo);
-            }
-            console.log(respuesta.data)
-            if (respuesta.data[0][0].outResult == 0) {
-                res.redirect('./articulos');
-            }
-            else {
-                if (respuesta.data[0][0].outResult == 1001) {
-                    res.render("articulos.ejs", {
-                    mensajeError : "Artículo con nombre duplicado.",
-                    productos : listaArticulos});
-                }
-            }
-        }
-    }, 1500)
-})*/
 app.post('/cancelar', (req, res) => {
     res.redirect('./ventanaPrincipal');
 })
@@ -145,47 +140,78 @@ function filtrarNombre (nombre, res) {
 }
 
 function cargarPuestos() {
+    let nuevosPuestos = [];
     setTimeout(async () => {
         const resultado = await based.executeStoredProcedure('ListarPuestos',
         null, {outResult : 0});
         if (resultado != undefined) {
             console.log(resultado.data[0]);
             for (puesto of resultado.data[0]) {
-                var valido = true;
                 if (listaPuestos.length == 0) {
-                    listaPuestos.push([false, puesto]);
+                    nuevosPuestos.push([false, puesto]);
                     continue;
                 }
-                else {
-                    for (puestoExiste of listaPuestos) {
-                        if (puestoExiste[1].Puesto == puesto.Puesto)
-                            valido = false;
-                    }
-                    if (valido)
-                        listaPuestos.push([false, puesto]);
-                }
-            }
-            listaPuestos.sort(function (puesto1, puesto2) {
-                if (puesto1[1].Puesto > puesto2[1].Puesto)
-                    return 1;
-                if (puesto1[1].Puesto < puesto2[1].Puesto)
-                    return -1;
+                else if (listaPuestos.find(existe =>
+                    existe[0] === false && existe[1].Puesto === puesto.Puesto))
+                    nuevosPuestos.push([false, puesto]);
+                else if (listaPuestos.find(existe =>
+                    existe[0] === true && existe[1].Puesto === puesto.Puesto))
+                    nuevosPuestos.push([true, [puesto]]);
                 else
-                    return 0;
-            })
+                    nuevosPuestos.push([false, puesto]);
+            }
+            listaPuestos = nuevosPuestos;
         }
     }, 1500)
 }
 
 function cargarEmpleados() {
+    let nuevosEmpleados = [];
     setTimeout(async () => {
         const resultado = await based.executeStoredProcedure('ListarEmpleados',
         null, {outResult : 0});
         if (resultado != undefined) {
             console.log(resultado.data[0]);
-            for (empleado of resultado.data[0])
-                listaEmpleados.push([false, empleado]);
+            for (empleado of resultado.data[0]){
+                if (listaEmpleados.length == 0) {
+                    nuevosEmpleados.push([false, empleado]);
+                    continue;
+                }
+                else if (listaEmpleados.find(existe =>
+                    existe[0] === false && existe[1].Nombre === empleado.Nombre))
+                    nuevosEmpleados.push([false, empleado]);
+                else if (listaEmpleados.find(existe =>
+                    existe[0] === true && existe[1].Nombre === empleado.Nombre))
+                    nuevosEmpleados.push([true, empleado]);
+                else
+                    nuevosEmpleados.push([false, empleado]);
+            }
+            listaEmpleados = nuevosEmpleados;
         }
+    }, 1500)
+}
+
+function cargarTipoDoc() {
+    setTimeout(async () => {
+        const resultado = await based.executeStoredProcedure('ObtenerTipoDoc',
+        null, {outResult : 0});
+        if (resultado != undefined) {
+            for (tipoDoc of resultado.data[0])
+                listaTipoDoc.push(tipoDoc);
+        }
+        console.log(listaTipoDoc);
+    }, 1500)
+}
+
+function cargarDepartamentos() {
+    setTimeout(async () => {
+        const resultado = await based.executeStoredProcedure('ObtenerDepartamento',
+        null, {outResult : 0});
+        if (resultado != undefined) {
+            for (departamento of resultado.data[0])
+                listaDepartamentos.push(departamento);
+        }
+        console.log(listaDepartamentos);
     }, 1500)
 }
 
@@ -215,7 +241,18 @@ function insertarPuestoFunc(nuevoPuesto) {
     }, 1500)
 }
 
-
-
+function insertarEmpleadoFunc(nuevoEmpleado) {
+    setTimeout(async () => {
+        const respuesta = await based.executeStoredProcedure('InsertarEmpleado', null,
+        {inNombre : nuevoEmpleado.Nombre,
+        inIdTipoIdentificacion : nuevoEmpleado.IdTipoIdentificacion,
+        inValorDocIdentificacion : nuevoEmpleado.ValorDocumentoIdentificacion,
+        inIdDepartamento : nuevoEmpleado.IdDepartamento,
+        inPuesto : nuevoEmpleado.Puesto,
+        inFechaNacimiento : nuevoEmpleado.FechaNacimiento, 
+        outResult : 0});
+        cargarEmpleados();
+    }, 1500)
+}
 // Creacion del puerto para acceder la pagina web
 app.listen(3000)
