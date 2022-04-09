@@ -1,0 +1,63 @@
+<h1>
+    Editar Empleado
+</h1>
+<form action = "editarEmpleado" method = "POST" style = "font-size : large">
+    <div>
+        <label for = "nomEmpleado">Nombre:</label>
+        <input type = "text" id = "nomEmpleado" name = "nomEmpleado" required>
+    </div>
+    <div>
+        <label for = "tipoIdentificacionSeleccion">
+                Tipo de identificacion:
+        </label>
+    </div>
+    <div>
+        <select id = "tipoIdentificacionSeleccion"
+        name = "tipoIdentificacionSeleccion" size = "3">
+            <% for (tipoIdDoc of listaTipoDoc) { %>
+                <option value = "<%=tipoIdDoc.IdTipoIdentificacion%>">
+                    <%=tipoIdDoc.Nombre%>
+                </option>
+            <% } %>
+        </select>
+    </div>
+    <div>
+        <label for = "valorDoc">Valor del documento de identificación:</label>
+        <input type = "text" id = "valorDoc" name = "valorDoc" required>
+    </div>
+    <div>
+        <label for = "fechaNacimiento">Fecha de nacimiento:</label>
+        <input type = "text" id = "fechaNacimiento" name = "fechaNacimiento" required>
+    </div>
+    <div>
+        <label for = "puestoSeleccion">Puesto:</label>
+    </div>
+    <div>
+        <select id = "puestoSeleccion" name = "puestoSeleccion" size = "3">
+            <% for (puesto of listaPuestos) {
+                    if (puesto[0] == false) %>
+                        <option value = "<%=puesto[1].Puesto%>">
+                            <%=puesto[1].Puesto%>
+                        </option>
+            <% } %>
+        </select>
+    </div>
+    <div>
+        <label for = "departamentoSeleccion">Departamento:</label>
+    </div>
+    <div>
+        <select id = "departamentoSeleccion" name = "departamentoSeleccion"
+        size = "3">
+            <% for (departamento of listaDepartamentos) { %>
+                <option value = "<%=departamento.IdDepartamento%>">
+                    <%=departamento.Nombre%>
+                </option>
+            <% } %>
+        </select>
+    </div>
+    <div>
+        <button formaction = "editarEmpleadoB"
+        id = "editarEmpleadoBoton"
+        name = "editarEmpleadoBoton">Editar</button>
+    </div>
+</form>

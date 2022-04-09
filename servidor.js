@@ -13,6 +13,7 @@ const based = new (require('rest-mssql-nodejs'))({
 
 // Variables
 var admin = {};
+let idGlobal;
 let listaPuestos = [];
 let listaEmpleados = [];
 let listaTipoDoc = [];
@@ -39,6 +40,14 @@ app.post('/insertarPuesto', (req, res) => {
 })
 app.post('/insertarEmpleado', (req, res) => {
     res.render('insertarEmpleado.ejs', {
+        listaPuestos : listaPuestos,
+        listaDepartamentos : listaDepartamentos,
+        listaTipoDoc : listaTipoDoc
+    });
+})
+app.post('/editarEmpleado', (req, res) => {
+    idGlobal = req.body.empleadosListBox;
+    res.render('editarEmpleado.ejs', {
         listaPuestos : listaPuestos,
         listaDepartamentos : listaDepartamentos,
         listaTipoDoc : listaTipoDoc
@@ -95,6 +104,18 @@ app.post('/insertarEmpleadoB', (req, res) => {
 app.post('/filtrarEmpleado', (req, res) => {
     filtro = req.body.nomEmpleado;
     filtrarNombre(filtro, res);
+})
+app.post('/editarEmpleadoB', (req, res) => {
+    let empleadoEditado = {
+        Nombre : req.body.nomEmpleado,
+        IdTipoIdentificacion : req.body.tipoIdentificacionSeleccion,
+        ValorDocumentoIdentificacion : req.body.valorDoc,
+        FechaNacimiento : req.body.fechaNacimiento,
+        Puesto : req.body.puestoSeleccion,
+        IdDepartamento : req.body.departamentoSeleccion
+    }
+    editarEmpleadoFunc(empleadoEditado);
+    res.redirect('./ventanaPrincipal')
 })
 app.post('/cancelar', (req, res) => {
     res.redirect('./ventanaPrincipal');
@@ -178,10 +199,10 @@ function cargarEmpleados() {
                     continue;
                 }
                 else if (listaEmpleados.find(existe =>
-                    existe[0] === false && existe[1].Nombre === empleado.Nombre))
+                    existe[0] === false && existe[1].ID === empleado.ID))
                     nuevosEmpleados.push([false, empleado]);
                 else if (listaEmpleados.find(existe =>
-                    existe[0] === true && existe[1].Nombre === empleado.Nombre))
+                    existe[0] === true && existe[1].ID === empleado.ID))
                     nuevosEmpleados.push([true, empleado]);
                 else
                     nuevosEmpleados.push([false, empleado]);
@@ -224,10 +245,11 @@ function eliminarPuesto(nomPuesto) {
     return;
 }
 
-function eliminarEmpleado(nomEmpleado) {
+function eliminarEmpleado(idEmpleado) {
     for (empleado of listaEmpleados) {
-        if (empleado[1].Nombre == nomEmpleado) {
+        if (empleado[1].ID == idEmpleado) {
             empleado[0] = true;
+            return;
         }
     }
     return;
@@ -250,6 +272,21 @@ function insertarEmpleadoFunc(nuevoEmpleado) {
         inIdDepartamento : nuevoEmpleado.IdDepartamento,
         inPuesto : nuevoEmpleado.Puesto,
         inFechaNacimiento : nuevoEmpleado.FechaNacimiento, 
+        outResult : 0});
+        cargarEmpleados();
+    }, 1500)
+}
+
+function editarEmpleadoFunc(empleadoEditado) {
+    setTimeout(async () => {
+        const respuesta = await based.executeStoredProcedure('EditarEmpleado', null,
+        {inIdEditar : idGlobal,
+        inNombre : empleadoEditado.Nombre,
+        inIdTipoIdentificacion : empleadoEditado.IdTipoIdentificacion,
+        inValorDocIdentificacion : empleadoEditado.ValorDocumentoIdentificacion,
+        inIdDepartamento : empleadoEditado.IdDepartamento,
+        inPuesto : empleadoEditado.Puesto,
+        inFechaNacimiento : empleadoEditado.FechaNacimiento, 
         outResult : 0});
         cargarEmpleados();
     }, 1500)

@@ -51,7 +51,7 @@
                 <div style = "font-size: large;">
                     Nombre del puesto
                 </div>
-                <select id = "puestosListBox" name = "puestosListBox" size = "25">
+                <select id = "puestosListBox" name = "puestosListBox" size = "15">
                     <% for (puesto of datos) {%>
                         <% if (puesto[0] == false) { %>
                                 <option value = "<%= puesto[1].Puesto %>"
@@ -73,10 +73,11 @@
                 <div style = "font-size: large;">
                     Nombre de los empleados
                 </div>
-                <select id = "empleadosListBox" name = "empleadosListBox" size = "25">
+                <select id = "empleadosListBox" name = "empleadosListBox" size = "15">
                     <% for (empleado of datos) {%>
                         <% if (empleado[0] == false) { %>
-                                <option value = "<%= empleado[1].Nombre %>"
+                                <option value = 
+                                "<%= empleado[1].ID %>"
                                 style = "font-size: large;">
                                     <%= empleado[1].Nombre + " | " + empleado[1].Puesto %>
                                 </option>
