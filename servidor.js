@@ -53,6 +53,10 @@ app.post('/editarEmpleado', (req, res) => {
         listaTipoDoc : listaTipoDoc
     });
 })
+app.post('/editarPuesto', (req, res) => {
+    idGlobal = req.body.puestosListBox;
+    res.render('editarPuesto.ejs')
+})
 
 // Funciones de las paginas web
 app.post('/login', (req, res) => {
@@ -113,9 +117,17 @@ app.post('/editarEmpleadoB', (req, res) => {
         FechaNacimiento : req.body.fechaNacimiento,
         Puesto : req.body.puestoSeleccion,
         IdDepartamento : req.body.departamentoSeleccion
-    }
+    };
     editarEmpleadoFunc(empleadoEditado);
-    res.redirect('./ventanaPrincipal')
+    res.redirect('./ventanaPrincipal');
+})
+app.post('/editarPuestoB', (req, res) => {
+    let puestoEditado = {
+        Nombre : req.body.nomPuesto,
+        SalarioXHora : req.body.salario
+    };
+    editarPuestoFunc(puestoEditado);
+    res.redirect('./ventanaPrincipal');
 })
 app.post('/cancelar', (req, res) => {
     res.redirect('./ventanaPrincipal');
@@ -291,5 +303,18 @@ function editarEmpleadoFunc(empleadoEditado) {
         cargarEmpleados();
     }, 1500)
 }
+
+function editarPuestoFunc(puestoEditado) {
+    console.log(idGlobal);
+    setTimeout(async () => {
+        const respuesta = await based.executeStoredProcedure('EditarPuesto', null,
+        {inIdEditar : idGlobal,
+        inNombre : puestoEditado.Nombre,
+        inSalarioXHora : puestoEditado.SalarioXHora,
+        outResult : 0});
+        cargarPuestos();
+    }, 1500)
+}
+
 // Creacion del puerto para acceder la pagina web
 app.listen(3000)

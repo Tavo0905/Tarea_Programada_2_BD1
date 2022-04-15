@@ -54,7 +54,7 @@
                 <select id = "puestosListBox" name = "puestosListBox" size = "15">
                     <% for (puesto of datos) {%>
                         <% if (puesto[0] == false) { %>
-                                <option value = "<%= puesto[1].Puesto %>"
+                                <option value = "<%= puesto[1].ID %>"
                                 style = "font-size: large;">
                                     <%= puesto[1].Puesto %>
                                 </option>
