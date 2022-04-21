@@ -136,8 +136,6 @@ app.post('/salir', (req, res) => {
     res.redirect('./');
 })
 
-
-
 // Funciones logicas
 function validarDatos (adminDatos, res) {
     setTimeout(async () => {
@@ -162,6 +160,7 @@ function filtrarNombre (nombre, res) {
         {inFiltroNom : nombre, outResult : 0});
         if (resFiltroNom != undefined) {
             for (empleado of resFiltroNom.data[0]) {
+                empleado.FechaNacimiento = String(empleado.FechaNacimiento).slice(0, 15)
                 if (listaEmpleados.find(existe =>
                     existe[0] === false && existe[1].Nombre === empleado.Nombre))
                     empleadosFiltrados.push([false, empleado]);
@@ -206,6 +205,7 @@ function cargarEmpleados() {
         if (resultado != undefined) {
             console.log(resultado.data[0]);
             for (empleado of resultado.data[0]){
+                empleado.FechaNacimiento = String(empleado.FechaNacimiento).slice(0, 15)
                 if (listaEmpleados.length == 0) {
                     nuevosEmpleados.push([false, empleado]);
                     continue;

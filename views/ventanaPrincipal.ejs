@@ -71,7 +71,8 @@
                 </div>
             <% } else if (tipoDatos == "empleados") { %>
                 <div style = "font-size: large;">
-                    Nombre de los empleados
+                    Nombre de los empleados | Puesto | Id del Tipo de Identificacion | Valor Documento de Identificacion 
+                    | Fecha de nacimiento
                 </div>
                 <select id = "empleadosListBox" name = "empleadosListBox" size = "15">
                     <% for (empleado of datos) {%>
@@ -79,7 +80,9 @@
                                 <option value = 
                                 "<%= empleado[1].ID %>"
                                 style = "font-size: large;">
-                                    <%= empleado[1].Nombre + " | " + empleado[1].Puesto %>
+                                    <%= empleado[1].Nombre + " | " + empleado[1].Puesto + " | " +
+                                    empleado[1].IdTipoIdentificacion + " | " + empleado[1].ValorDocumentoIdentificacion
+                                    + " | " +  empleado[1].FechaNacimiento%>
                                 </option>
                         <% } %>
                     <% } %>
