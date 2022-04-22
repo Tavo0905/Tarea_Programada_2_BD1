@@ -77,6 +77,7 @@ app.post('/listarEmpleados', (req, res) => {
     tipoDatos : "empleados", datos : listaEmpleados});
 })
 app.post('/eliminarPuesto', (req, res) => {
+    console.log(req.body.puestosListBox);
     eliminarPuesto(req.body.puestosListBox);
     res.render('ventanaPrincipal.ejs', {mensajeError : "",
     tipoDatos : "puestos", datos : listaPuestos});
@@ -248,9 +249,10 @@ function cargarDepartamentos() {
     }, 1500)
 }
 
-function eliminarPuesto(nomPuesto) {
+function eliminarPuesto(IdPuesto) {
     for (puesto of listaPuestos) {
-        if (puesto[1].Puesto == nomPuesto) {
+        console.log(puesto);
+        if (puesto[1].ID == IdPuesto) {
             puesto[0] = true;
         }
     }
